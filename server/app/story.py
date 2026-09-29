@@ -60,6 +60,11 @@ def _viewpoint(a: dict, b: dict) -> tuple[float, str]:
 NOT_A_VIEW = {"project signboard", "people working"}
 
 
+def _off_site(result: dict | None) -> bool:
+    """The photo's own GPS puts it outside the site: it cannot show this site's before or after."""
+    return any(c["key"] == "location" and c["status"] == "fail" for c in (result or {}).get("checks", []))
+
+
 def pair_for_site(project: dict, site: dict, proofs: dict[str, dict] | None = None) -> dict | None:
     items = _usable_images(project, site["id"])
     by_id = {e["id"]: e for e in items}
@@ -69,6 +74,7 @@ def pair_for_site(project: dict, site: dict, proofs: dict[str, dict] | None = No
         e for e in items
         if (e.get("exif") or {}).get("taken_at")
         and (not proofs or proofs.get(e["id"], {}).get("grade") != "weak")
+        and not (proofs and _off_site(proofs.get(e["id"])))
         and not (e.get("activities") and {a["name"] for a in e["activities"]} <= NOT_A_VIEW)
     ]
     manual = site.get("pair") or {}
