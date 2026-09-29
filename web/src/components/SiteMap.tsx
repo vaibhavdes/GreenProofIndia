@@ -53,8 +53,9 @@ export default function SiteMap({
 }) {
   const located = evidence.filter((e) => e.status === "ready" && e.exif?.lat != null);
   const focus = sites.find((s) => s.id === focusSiteId);
-  const fitPoints: LatLng[] = drawing?.length
-    ? drawing
+  // While drawing, the map stays where the user put it: refitting on every click would move the shoreline away.
+  const fitPoints: LatLng[] = drawing
+    ? []
     : focus?.boundary.length
       ? focus.boundary
       : [...sites.flatMap((s) => s.boundary), ...located.map((e) => [e.exif!.lat!, e.exif!.lng!] as LatLng)];
