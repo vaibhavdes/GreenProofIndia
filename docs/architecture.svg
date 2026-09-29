@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" font-family="Inter, -apple-system, Segoe UI, Roboto, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#57534e"/>
+    </marker>
+    <style>
+      .t{font-size:15px;font-weight:700;fill:#1c1917}
+      .s{font-size:12.5px;fill:#44403c}
+      .h{font-size:13px;font-weight:700;letter-spacing:.06em;fill:#57534e}
+      .l{stroke:#57534e;stroke-width:1.6;fill:none;marker-end:url(#a)}
+      .n{font-size:11.5px;fill:#57534e}
+    </style>
+  </defs>
+  <rect width="1200" height="700" fill="#ffffff"/>
+  <text x="600" y="28" text-anchor="middle" font-size="20" font-weight="800" fill="#065f46">GreenProof architecture</text>
+
+  <!-- Users -->
+  <text x="40" y="84" class="h">USERS</text>
+  <rect x="30" y="100" width="230" height="110" rx="12" fill="#ecfdf5" stroke="#10b981"/>
+  <text x="48" y="128" class="t">Field team</text>
+  <text x="48" y="150" class="s">Phone / laptop browser</text>
+  <text x="48" y="170" class="s">Upload Widget, map, review</text>
+  <text x="48" y="190" class="s">accept / reject evidence</text>
+
+  <rect x="30" y="250" width="230" height="110" rx="12" fill="#ecfdf5" stroke="#10b981"/>
+  <text x="48" y="278" class="t">Funder / verifier</text>
+  <text x="48" y="300" class="s">Public report link</text>
+  <text x="48" y="320" class="s">Before/after, reel, PDF pack,</text>
+  <text x="48" y="340" class="s">provenance of every item</text>
+
+  <rect x="30" y="400" width="230" height="130" rx="12" fill="#f5f5f4" stroke="#a8a29e"/>
+  <text x="48" y="428" class="t">React web app</text>
+  <text x="48" y="450" class="s">Sites · Evidence · Timeline</text>
+  <text x="48" y="470" class="s">Before/after · Impact</text>
+  <text x="48" y="490" class="s">Audit log · Public report</text>
+  <text x="48" y="510" class="s">Vite · Tailwind · Leaflet</text>
+
+  <!-- Server -->
+  <text x="330" y="84" class="h">GREENPROOF SERVER · FASTAPI</text>
+  <rect x="320" y="100" width="330" height="560" rx="14" fill="#fafaf9" stroke="#78716c"/>
+  <g>
+    <rect x="340" y="120" width="290" height="64" rx="10" fill="#fff" stroke="#d6d3d1"/>
+    <text x="356" y="146" class="t">Upload signing</text>
+    <text x="356" y="168" class="s">Signs widget requests for our presets only</text>
+
+    <rect x="340" y="196" width="290" height="80" rx="10" fill="#fff" stroke="#d6d3d1"/>
+    <text x="356" y="222" class="t">Ingest</text>
+    <text x="356" y="244" class="s">Asset facts, SHA-256, GPS → site match,</text>
+    <text x="356" y="262" class="s">AI per item, tags written back</text>
+
+    <rect x="340" y="288" width="290" height="80" rx="10" fill="#fff" stroke="#d6d3d1"/>
+    <text x="356" y="314" class="t">Proof Score</text>
+    <text x="356" y="336" class="s">Location · time · originality (reuse</text>
+    <text x="356" y="354" class="s">across all projects) · file integrity</text>
+
+    <rect x="340" y="380" width="290" height="80" rx="10" fill="#fff" stroke="#d6d3d1"/>
+    <text x="356" y="406" class="t">Pairing · metrics · summary</text>
+    <text x="356" y="428" class="s">Same-viewpoint before/after, water</text>
+    <text x="356" y="446" class="s">spread, survival, plain-language summary</text>
+
+    <rect x="340" y="472" width="290" height="80" rx="10" fill="#fff" stroke="#d6d3d1"/>
+    <text x="356" y="498" class="t">Story builder</text>
+    <text x="356" y="520" class="s">Composites, social crops, reel frames,</text>
+    <text x="356" y="538" class="s">verification pack pages</text>
+
+    <rect x="340" y="564" width="290" height="80" rx="10" fill="#fff" stroke="#d6d3d1"/>
+    <text x="356" y="590" class="t">Records &amp; access</text>
+    <text x="356" y="612" class="s">Project records cached in memory,</text>
+    <text x="356" y="630" class="s">team key, public share tokens</text>
+  </g>
+
+  <!-- Cloudinary -->
+  <text x="720" y="84" class="h">CLOUDINARY (ONLY STORAGE AND AI)</text>
+  <rect x="710" y="100" width="460" height="560" rx="14" fill="#eef2ff" stroke="#3448c5"/>
+  <g>
+    <rect x="730" y="120" width="420" height="64" rx="10" fill="#fff" stroke="#a5b4fc"/>
+    <text x="746" y="146" class="t">Signed upload presets · overwrite off</text>
+    <text x="746" y="168" class="s">Media metadata (GPS, time, camera) · phash · quality · faces</text>
+
+    <rect x="730" y="196" width="420" height="80" rx="10" fill="#fff" stroke="#a5b4fc"/>
+    <text x="746" y="222" class="t">Media Library · Admin &amp; Search API</text>
+    <text x="746" y="244" class="s">Original photos and videos, versions, derived assets,</text>
+    <text x="746" y="262" class="s">tags and context (site, activity, score, reuse flag)</text>
+
+    <rect x="730" y="288" width="420" height="80" rx="10" fill="#fff" stroke="#a5b4fc"/>
+    <text x="746" y="314" class="t">Analyze API · add-ons</text>
+    <text x="746" y="336" class="s">AI Vision (10 restoration activity tags) · AI Content</text>
+    <text x="746" y="354" class="s">Analysis (captions) · Google Auto Tagging · visual search</text>
+
+    <rect x="730" y="380" width="420" height="80" rx="10" fill="#fff" stroke="#a5b4fc"/>
+    <text x="746" y="406" class="t">Transformations</text>
+    <text x="746" y="428" class="s">c_fill / g_auto crops · e_blur_faces · e_improve · layers</text>
+    <text x="746" y="446" class="s">text overlays · video frames (so_) · q_auto / f_auto</text>
+
+    <rect x="730" y="472" width="420" height="80" rx="10" fill="#fff" stroke="#a5b4fc"/>
+    <text x="746" y="498" class="t">multi · signed delivery</text>
+    <text x="746" y="520" class="s">MP4 impact reel and PDF verification pack</text>
+    <text x="746" y="538" class="s">built from tagged frames and pages</text>
+
+    <rect x="730" y="564" width="420" height="80" rx="10" fill="#fff" stroke="#a5b4fc"/>
+    <text x="746" y="590" class="t">Project records</text>
+    <text x="746" y="612" class="s">Sites, measurements, stories, audit log as</text>
+    <text x="746" y="630" class="s">authenticated raw JSON (no separate database)</text>
+  </g>
+
+  <!-- Arrows -->
+  <path d="M260 155 H 290 V 450" stroke="#57534e" stroke-width="1.6" fill="none"/>
+  <path d="M260 305 H 290" stroke="#57534e" stroke-width="1.6" fill="none"/>
+  <path class="l" d="M290 450 H 262"/>
+  <path class="l" d="M260 505 H 318"/>
+  <text x="266" y="498" class="n">API</text>
+  <path class="l" d="M145 100 V 56 H 1080 V 118"/>
+  <text x="560" y="50" class="n" text-anchor="middle">files go straight to Cloudinary with the Upload Widget (signed by the server)</text>
+  <path class="l" d="M630 152 H 728"/>
+  <text x="644" y="144" class="n">sign</text>
+  <path class="l" d="M630 236 H 728"/>
+  <text x="644" y="228" class="n">details</text>
+  <path class="l" d="M630 328 H 728"/>
+  <text x="644" y="320" class="n">AI</text>
+  <path class="l" d="M630 420 H 728"/>
+  <path class="l" d="M630 512 H 728"/>
+  <path class="l" d="M630 604 H 728"/>
+  <text x="644" y="596" class="n">read / write</text>
+</svg>
