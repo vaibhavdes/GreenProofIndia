@@ -129,12 +129,12 @@ Upload original camera files so GPS and time stay in them. If photos come throug
 | Variable | Default | Purpose |
 |---|---|---|
 | `CLOUDINARY_URL` | – | Cloudinary account (required) |
-| `EDITOR_KEY` | empty locally | Team key. Required by `deploy.sh` for Cloud Run; public report links stay open |
+| `EDITOR_KEY` | empty | Team key. When set, only the team can open and change projects; public report links stay open |
 | `CLD_AI_VISION`, `CLD_CAPTIONING`, `CLD_TAGGING` | `true` | Turn individual AI add-ons off |
 | `CLD_VISUAL_SEARCH` | `true` | Index photos for Cloudinary visual search (enabled for an account by Cloudinary support on request; until then search uses captions, tags and activities) |
 | `GP_FOLDER` | `greenproof` | Media Library folder |
 
-**Deploy to Google Cloud Run:** with `gcloud` signed in and a project selected, run `EDITOR_KEY=<strong-team-key> ./deploy.sh` for the first deploy. Later deploys reuse the key in Secret Manager unless a new `EDITOR_KEY` is supplied. The script builds the `Dockerfile` (web app and API in one container) on Cloud Build, stores `CLOUDINARY_URL` (read from `server/.env`) in Secret Manager and deploys one always-on instance: project records are held in memory, and AI analysis runs in the background after each request. The app checks the team key on editing APIs; public report links stay open.
+**Deploy to Google Cloud Run:** with `gcloud` signed in and a project selected, run `./deploy.sh`. It builds the `Dockerfile` (web app and API in one container) on Cloud Build, stores `CLOUDINARY_URL` (read from `server/.env`) in Secret Manager and deploys one always-on instance: project records are held in memory, and AI analysis runs in the background after each request. To limit the app to your team, run `EDITOR_KEY=<key> ./deploy.sh`.
 
 ## Limits
 
@@ -142,8 +142,8 @@ Upload original camera files so GPS and time stay in them. If photos come throug
 - Reuse detection compares processed files within GreenProof. Near-duplicate detection uses image perceptual hashes; videos receive only the exact-file check. It cannot recognise a photo copied from elsewhere on the internet.
 - Water spread and survival counts are field observations entered by the team.
 - GreenProof presents evidence; it does not issue or certify carbon or green credits.
-- Face blur is applied to shared photos and photo-based outputs, but automatic detection can miss a face. Cloudinary's face blur works on images only, so videos reach the public report only after the team accepts them. Evidence originals currently use Cloudinary's public upload delivery; hiding their URLs in the app does not make them private. Do not upload sensitive media until protected originals and a migration of existing assets are implemented.
-- The verification pack currently includes up to 28 photos, and SHA-256 is calculated only for images that can be downloaded within the current 40 MB limit. The app audit history is stored in an overwritable project record and is not tamper-evident.
+- Face blur is applied to shared photos and photo-based outputs, but automatic detection can miss a face. Cloudinary's face blur works on images only, so videos reach the public report only after the team accepts them. Original file URLs are not shown in the public report, but originals use Cloudinary's standard upload delivery, so anyone holding an exact original URL can open it.
+- The verification pack includes up to 28 photos. SHA-256 is calculated for images up to 40 MB. The audit history is stored in the project record and is not tamper-evident.
 
 ## Credits
 
