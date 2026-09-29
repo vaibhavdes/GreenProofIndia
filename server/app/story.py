@@ -57,11 +57,20 @@ def _viewpoint(a: dict, b: dict) -> tuple[float, str]:
     return score, ", ".join(notes)
 
 
+NOT_A_VIEW = {"project signboard", "people working"}
+
+
 def pair_for_site(project: dict, site: dict, proofs: dict[str, dict] | None = None) -> dict | None:
     items = _usable_images(project, site["id"])
     by_id = {e["id"]: e for e in items}
     # Auto-pairing trusts only the camera's own timestamp, and never weak (e.g. reused) evidence.
-    candidates = [e for e in items if (e.get("exif") or {}).get("taken_at") and (not proofs or proofs.get(e["id"], {}).get("grade") != "weak")]
+    # A photo of just the signboard or the workers shows nothing of the site's condition.
+    candidates = [
+        e for e in items
+        if (e.get("exif") or {}).get("taken_at")
+        and (not proofs or proofs.get(e["id"], {}).get("grade") != "weak")
+        and not (e.get("activities") and {a["name"] for a in e["activities"]} <= NOT_A_VIEW)
+    ]
     manual = site.get("pair") or {}
     if manual.get("before") in by_id and manual.get("after") in by_id:
         before, after = by_id[manual["before"]], by_id[manual["after"]]

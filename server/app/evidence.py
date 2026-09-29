@@ -33,6 +33,8 @@ def parse_coord(value, ref: str | None = None) -> float | None:
         number = float(value)
     else:
         text = str(value).strip()
+        if not text:  # some phones write empty GPS tags when there is no fix
+            return None
         match = _DMS.search(text)
         if match:
             d, m, s, hemi = match.groups()
@@ -198,7 +200,8 @@ def placeholder(project: dict, public_id: str, resource_type: str) -> dict:
         existing = next((e for e in project.setdefault("evidence", []) if e["public_id"] == public_id), None)
         if existing:
             return existing
-        record = {"id": f"pending:{public_id}", "public_id": public_id, "resource_type": resource_type, "status": "processing", "uploaded_at": store.now_iso()}
+        # URL-safe until the real asset ID arrives, so a failed item can be retried from the UI.
+        record = {"id": "pending-" + hashlib.sha1(public_id.encode()).hexdigest()[:16], "public_id": public_id, "resource_type": resource_type, "status": "processing", "uploaded_at": store.now_iso()}
         project["evidence"].append(record)
         store.touch(project["id"])
         return record
