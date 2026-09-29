@@ -95,38 +95,55 @@ def _evidence(project: dict, eid: str) -> dict:
 PRIVATE_FIELDS = ("device", "secure_url", "uploader", "chosen_site", "original_filename", "error")
 
 
-def _is_public(ev: dict) -> bool:
-    """Shown in the public report: processed, not rejected, and videos only once accepted (faces in video are not blurred)."""
+def _is_public(ev: dict, result: dict) -> bool:
+    """Weak evidence and videos need an explicit team decision before publication."""
     review = (ev.get("review") or {}).get("status")
-    return ev.get("status") == "ready" and review != "rejected" and (ev["resource_type"] != "video" or review == "accepted")
+    return (
+        ev.get("status") == "ready"
+        and review != "rejected"
+        and (result["grade"] != "weak" or review == "accepted")
+        and (ev["resource_type"] != "video" or review == "accepted")
+    )
+
+
+def _public_story(item: dict, visible_ids: set[str]) -> bool:
+    sources = item.get("sources") or []
+    return item.get("status") == "ready" and bool(sources) and set(sources).issubset(visible_ids)
 
 
 def build_view(project: dict, public: bool = False) -> dict:
     index = proof.build_index(store.all_projects())
     items, proofs = [], {}
     for ev in project.get("evidence", []):
-        if public and not _is_public(ev):
-            continue
         item = dict(ev)
         if ev.get("status") == "ready":
-            item["proof"] = proofs[ev["id"]] = proof.score(ev, project, index)
+            result = proof.score(ev, project, index)
+            if public and not _is_public(ev, result):
+                continue
+            item["proof"] = proofs[ev["id"]] = result
             item["views"] = story.views(ev, public)
+        elif public:
+            continue
         if public:
             for field in PRIVATE_FIELDS:
                 item.pop(field, None)
+            if item.get("review"):
+                item["review"] = {"status": item["review"].get("status")}
         items.append(item)
     items.sort(key=lambda e: e.get("uploaded_at") or "", reverse=True)
+    visible_ids = set(proofs)
+    view_project = {**project, "evidence": [ev for ev in project.get("evidence", []) if ev["id"] in visible_ids]} if public else project
 
     sites = []
     for site in project.get("sites", []):
         s = dict(site)
-        s["metrics"] = metrics.site_metrics(project, site, proofs)
-        s["pair"] = story.pair_for_site(project, site, proofs)
+        s["metrics"] = metrics.site_metrics(view_project, site, proofs)
+        s["pair"] = story.pair_for_site(view_project, site, proofs)
         sites.append(s)
 
     stories = sorted(project.get("stories", []), key=lambda s: s["created_at"], reverse=True)
     if public:
-        stories = [s for s in stories if s.get("status") == "ready"][:1]
+        stories = [s for s in stories if _public_story(s, visible_ids)][:1]
     view = {
         "id": project["id"],
         "name": project["name"],
@@ -306,6 +323,19 @@ def update_site(pid: str, sid: str, body: SitePatch):
     changes = body.model_dump(exclude_unset=True)
     if "boundary" in changes:
         _valid_boundary(body.boundary or [])
+    if body.pair and not body.clear_pair:
+        choices = {
+            ev["id"]: ev for ev in project.get("evidence", [])
+            if ev.get("site_id") == sid and ev.get("resource_type") == "image"
+            and ev.get("status") == "ready" and (ev.get("review") or {}).get("status") != "rejected"
+        }
+        before, after = choices.get(body.pair.get("before")), choices.get(body.pair.get("after"))
+        if not before or not after or before["id"] == after["id"]:
+            raise HTTPException(400, "Choose two different, usable photos of this site")
+        before_at = evidence.parse_iso(evidence.capture_time(before))
+        after_at = evidence.parse_iso(evidence.capture_time(after))
+        if not before_at or not after_at or before_at >= after_at:
+            raise HTTPException(400, "The before photo must be older than the after photo")
     with store.lock():
         for key in ("name", "boundary", "baseline_date"):
             if key in changes:
@@ -313,9 +343,6 @@ def update_site(pid: str, sid: str, body: SitePatch):
         if body.clear_pair:
             site.pop("pair", None)
         elif body.pair:
-            ids = {e["id"] for e in project["evidence"]}
-            if body.pair.get("before") not in ids or body.pair.get("after") not in ids:
-                raise HTTPException(400, "Pick two evidence items of this site")
             site["pair"] = {"before": body.pair["before"], "after": body.pair["after"]}
     if "boundary" in changes:
         _reassign(project)
@@ -389,7 +416,13 @@ def update_evidence(pid: str, eid: str, body: EvidencePatch):
 
 def _provenance(project: dict, ev: dict, public: bool) -> dict:
     outputs = []
+    visible_ids = set()
+    if public:
+        index = proof.build_index(store.all_projects())
+        visible_ids = {item["id"] for item in project.get("evidence", []) if item.get("status") == "ready" and _is_public(item, proof.score(item, project, index))}
     for s in project.get("stories", []):
+        if public and not _public_story(s, visible_ids):
+            continue
         if ev["id"] in (s.get("sources") or []):
             for c in s.get("composites", []):
                 if ev["id"] in (c["before"], c["after"]):
@@ -425,7 +458,7 @@ def _provenance(project: dict, ev: dict, public: bool) -> dict:
         },
         "outputs": outputs,
         "cloudinary_derived": derived,
-        "events": [({k: v for k, v in a.items() if k != "actor"} if public else a) for a in project.get("audit", []) if a.get("ref") == ev["id"]],
+        "events": [({"at": a["at"], "actor": "team", "action": a["action"], "detail": "", "ref": a.get("ref")} if public else a) for a in project.get("audit", []) if a.get("ref") == ev["id"]],
     }
 
 
@@ -575,7 +608,7 @@ def public_provenance(token: str, eid: str):
     if not project:
         raise HTTPException(404, "This report link is not valid")
     ev = _evidence(project, eid)
-    if not _is_public(ev):
+    if ev.get("status") != "ready" or not _is_public(ev, proof.score(ev, project, proof.build_index(store.all_projects()))):
         raise HTTPException(404, "Evidence not found")
     return _provenance(project, ev, public=True)
 

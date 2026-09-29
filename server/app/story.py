@@ -75,6 +75,9 @@ def pair_for_site(project: dict, site: dict, proofs: dict[str, dict] | None = No
             gap = _days(b, a)
             if gap < MIN_GAP_DAYS:
                 continue
+            distance = _distance(b, a)
+            if distance is not None and distance > 150:
+                continue
             view, notes = _viewpoint(b, a)
             value = view + min(gap / 365, 1) * 0.3
             if not best or value > best[0]:
@@ -244,12 +247,14 @@ def build(project: dict, story_id: str, view: dict):
                 sources.append(ev["id"])
 
         if not frames and strongest:
-            frames = [_reel_frame(ev, _date_label(ev), [next((s["name"] for s in view["sites"] if s["id"] == ev.get("site_id")), "")]) for ev in strongest[:6]]
+            fallback = strongest[:6]
+            frames = [_reel_frame(ev, _date_label(ev), [next((s["name"] for s in view["sites"] if s["id"] == ev.get("site_id")), "")]) for ev in fallback]
+            sources.extend(ev["id"] for ev in fallback if ev["id"] not in sources)
         if not frames:
             raise ValueError("Add at least two photos of one site, taken 2+ weeks apart, or some strong evidence first")
 
         cover = evidence[sources[-1]] if sources else strongest[0]
-        frames.append(_reel_frame(cover, project["name"], headline + ["Evidence verified with GreenProof"], dim=True))
+        frames.append(_reel_frame(cover, project["name"], headline + ["Evidence documented with GreenProof"], dim=True))
         frames.insert(0, _reel_frame(evidence[sources[0]] if sources else cover, project["name"], [project.get("org") or "", "Did the restoration work? Here is the evidence."], dim=True))
         pages.insert(0, _cover_page(cover, project, (view.get("summary") or headline)[:7] + [f"Generated {datetime.now():%d %b %Y}", f"Funder: {project.get('funder') or '—'} · Implementer: {project.get('org') or '—'}"]))
 

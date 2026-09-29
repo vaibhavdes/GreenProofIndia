@@ -139,10 +139,10 @@ export default function Report() {
             <ShieldCheck className="size-4 text-emerald-700" /> How this evidence was checked
           </h2>
           <ul className="list-disc space-y-1 pl-5">
-            <li>Every photo and video is stored unchanged in Cloudinary; each item lists its public ID, version and SHA-256 hash so a verifier can match it to the original.</li>
-            <li>Proof Score = location (photo GPS inside the site boundary) + capture time + originality (no identical or near-identical file in any project, using Cloudinary perceptual hashes) + file integrity (camera data present, no editing software).</li>
+            <li>Evidence is stored in Cloudinary; each item lists its public ID, version and available hashes so a reviewer can trace its source.</li>
+            <li>Proof Score combines location, capture time, originality and file integrity. Originality checks exact file matches across GreenProof projects and near-duplicate photos using perceptual hashes.</li>
             <li>Activities such as desilting, water-filled lake or saplings planted are recognised by Cloudinary AI; survival counts and water spread are field observations entered by the team.</li>
-            <li>Faces are blurred in every photo shown here; videos are included only after the project team has accepted them. This report presents evidence; it does not certify carbon or green credits.</li>
+            <li>Face blur is applied to photos, but automatic detection can miss faces. Videos are included only after the project team accepts them and are shown without face blur. This report presents evidence; it does not certify carbon or green credits.</li>
           </ul>
         </section>
       </main>

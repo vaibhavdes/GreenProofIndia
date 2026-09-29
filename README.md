@@ -33,12 +33,12 @@ Satellite imagery does not close the gap for small sites: a 10 m pixel cannot se
 1. **Map the site.** Create a project, find the lake or plot on a satellite map and outline it. Download the boundary as KML.
 2. **Upload evidence.** Field workers upload photos and videos from a phone or laptop with the Cloudinary Upload Widget. Files can never be overwritten.
 3. **Understand it.** Cloudinary AI captions each item and labels restoration activities: dry lakebed, water-filled lake, desilting work, bund or embankment work, weeds or waste in water, saplings planted, established trees, dead or dry saplings, people working, project signboard. Videos are checked at the start, middle and end.
-4. **Verify it.** Every item gets a **Proof Score** with reasons (below). Items that look reused, were taken off-site or were edited are flagged for the team to accept or reject. Evidence is never deleted.
+4. **Review it.** Every item gets a **Proof Score** with reasons (below). Items that look reused, were taken off-site or were edited are flagged for the team to accept or reject. Weak items stay out of the public report until accepted. Evidence is never deleted through the app.
 5. **Organise and find it.** By project, by site (GPS matched to the boundary) and on a monthly timeline. Search in plain words ("dry lakebed with cracks") with filters for site, activity, proof grade and media type.
-6. **Compare.** The earliest and latest photos from the same spot (GPS and compass direction) are paired automatically into a before/after slider.
+6. **Compare.** Photos taken at least two weeks apart are paired into a before/after slider, preferring nearby GPS positions and similar compass directions. The team can also choose a pair.
 7. **Measure.** Record water spread per date (drawn on the map, in hectares) and sapling survival per survey (planted vs alive).
-8. **Tell the story.** A plain-language summary written from the data, and one click for a before/after image per site, a 9:16 reel, a verification pack PDF (every photo with its score and the reason for any flag) and social crops.
-9. **Share and trace.** A public report link for the funder, with faces blurred. Every item shows its original Cloudinary public ID, version, SHA-256, MD5 and perceptual hash, every output made from it and every derived version Cloudinary stores; an audit log records every change.
+8. **Tell the story.** A plain-language summary written from the data, and one click for a before/after image per site, a 9:16 reel, a verification pack PDF (up to 28 photos with scores and flag reasons) and social crops.
+9. **Share and trace.** A public report link for the funder, with face blur applied to photos. Each item shows its original Cloudinary public ID and version, available hashes, outputs made from it and an audit history of app changes.
 
 A "next steps" strip on each project shows what is left: outline the site, upload, review flagged items, record measurements, share the story.
 
@@ -61,7 +61,7 @@ A "next steps" strip on each project shows what is left: outline the site, uploa
 |---|---|---|---|
 | Location | 30 | Photo GPS is inside the site boundary (within 30 m, the accuracy of a phone GPS) | How far outside the boundary; no GPS in the file (15 if the phone was at the site at upload) |
 | Capture time | 20 | Camera time is present and plausible | Missing time, time after upload, far older than the project |
-| Originality | 35 | No identical (SHA-256 / MD5) or near-identical (perceptual hash distance ≤ 6) file in any project | Reused from another project or site; unchanged repeat of an old photo |
+| Originality | 35 | No identical file or near-identical photo (perceptual hash distance ≤ 6) in any processed GreenProof project | Reused from another project or site; unchanged repeat of an old photo |
 | File integrity | 15 | Camera make and model present, no editing app | Edited in Photoshop, Snapseed, PicsArt…; metadata stripped; blurry |
 
 80 and above is **strong**, 50–79 **needs review**, below 50 **weak**.
@@ -129,20 +129,21 @@ Upload original camera files so GPS and time stay in them. If photos come throug
 | Variable | Default | Purpose |
 |---|---|---|
 | `CLOUDINARY_URL` | – | Cloudinary account (required) |
-| `EDITOR_KEY` | empty | Team key. When set, only the team can open and change projects; public report links stay open |
+| `EDITOR_KEY` | empty locally | Team key. Required by `deploy.sh` for Cloud Run; public report links stay open |
 | `CLD_AI_VISION`, `CLD_CAPTIONING`, `CLD_TAGGING` | `true` | Turn individual AI add-ons off |
 | `CLD_VISUAL_SEARCH` | `true` | Index photos for Cloudinary visual search (enabled for an account by Cloudinary support on request; until then search uses captions, tags and activities) |
 | `GP_FOLDER` | `greenproof` | Media Library folder |
 
-**Deploy to Google Cloud Run:** with `gcloud` signed in and a project selected, run `./deploy.sh`. It builds the `Dockerfile` (web app and API in one container) on Cloud Build, stores `CLOUDINARY_URL` (read from `server/.env`) in Secret Manager and deploys one always-on instance: project records are held in memory, and AI analysis runs in the background after each request. To limit the app to your team, run `EDITOR_KEY=<key> ./deploy.sh`.
+**Deploy to Google Cloud Run:** with `gcloud` signed in and a project selected, run `EDITOR_KEY=<strong-team-key> ./deploy.sh` for the first deploy. Later deploys reuse the key in Secret Manager unless a new `EDITOR_KEY` is supplied. The script builds the `Dockerfile` (web app and API in one container) on Cloud Build, stores `CLOUDINARY_URL` (read from `server/.env`) in Secret Manager and deploys one always-on instance: project records are held in memory, and AI analysis runs in the background after each request. The app checks the team key on editing APIs; public report links stay open.
 
 ## Limits
 
-- The Proof Score raises confidence; it does not certify. GPS and time can be faked by a determined person, which is why reuse detection, the audit trail and human review sit beside it.
-- Reuse detection compares every file uploaded to GreenProof; it cannot recognise a photo copied from elsewhere on the internet.
+- The Proof Score raises confidence; it does not certify. GPS and time can be faked by a determined person, which is why reuse detection, the audit history and human review sit beside it.
+- Reuse detection compares processed files within GreenProof. Near-duplicate detection uses image perceptual hashes; videos receive only the exact-file check. It cannot recognise a photo copied from elsewhere on the internet.
 - Water spread and survival counts are field observations entered by the team.
 - GreenProof presents evidence; it does not issue or certify carbon or green credits.
-- Faces are blurred in every shared photo and in all generated media. Cloudinary's face blur works on images only, so videos reach the public report only after the team accepts them. Originals stay private to the team.
+- Face blur is applied to shared photos and photo-based outputs, but automatic detection can miss a face. Cloudinary's face blur works on images only, so videos reach the public report only after the team accepts them. Evidence originals currently use Cloudinary's public upload delivery; hiding their URLs in the app does not make them private. Do not upload sensitive media until protected originals and a migration of existing assets are implemented.
+- The verification pack currently includes up to 28 photos, and SHA-256 is calculated only for images that can be downloaded within the current 40 MB limit. The app audit history is stored in an overwritable project record and is not tamper-evident.
 
 ## Credits
 

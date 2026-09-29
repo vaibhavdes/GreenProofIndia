@@ -4,7 +4,7 @@
 #   ./deploy.sh
 #
 # The Cloudinary URL is read from server/.env (or $CLOUDINARY_URL) and stored in Secret Manager.
-# The app is open to anyone with the link. To limit it to your team, deploy with EDITOR_KEY=<key> ./deploy.sh
+# Set EDITOR_KEY=<key> on the first deploy. Later deploys reuse the saved Secret Manager key.
 # Override the target with GCP_PROJECT and GCP_REGION.
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -19,6 +19,10 @@ KEY_SECRET=greenproof-editor-key
 
 if [[ -z "$PROJECT" ]]; then
   echo "Set GCP_PROJECT or run: gcloud config set project <id>" >&2
+  exit 1
+fi
+if [[ -z "${EDITOR_KEY:-}" ]] && ! gcloud secrets describe "$KEY_SECRET" --project "$PROJECT" >/dev/null 2>&1; then
+  echo "Set EDITOR_KEY to a strong team key for the first deploy. Public report links remain open." >&2
   exit 1
 fi
 echo "Deploying $SERVICE to project $PROJECT ($REGION)"
@@ -50,13 +54,18 @@ elif ! secret_exists "$URL_SECRET"; then
   exit 1
 fi
 
-# Optional team key: only the team can open and change projects; public report links stay open.
+# Team key: only the team can open and change projects; public report links stay open.
 SECRETS="CLOUDINARY_URL=$URL_SECRET:latest"
 USED_SECRETS=("$URL_SECRET")
 if [[ -n "${EDITOR_KEY:-}" ]]; then
   secret_set "$KEY_SECRET" "$EDITOR_KEY"
+fi
+if secret_exists "$KEY_SECRET"; then
   SECRETS="$SECRETS,EDITOR_KEY=$KEY_SECRET:latest"
   USED_SECRETS+=("$KEY_SECRET")
+else
+  echo "Editor key secret is unavailable; deployment stopped." >&2
+  exit 1
 fi
 
 # Let the service read its secrets.

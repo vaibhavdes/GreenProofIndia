@@ -84,7 +84,7 @@ export default function EvidenceDetail({
               <img src={ev.views?.large} alt={ev.caption ?? ""} className="max-h-[60vh] w-full object-contain" />
             )}
           </div>
-          {token && <p className="text-xs text-stone-500">Faces in photos are blurred by Cloudinary in shared views; videos appear here only after the project team has accepted them. Originals are kept unchanged for verifiers.</p>}
+          {token && <p className="text-xs text-stone-500">Cloudinary applies face blur to shared photos, though detection can miss faces. Videos appear here only after team acceptance and are not face-blurred. Originals are kept unchanged for reviewers.</p>}
 
           <section>
             <h3 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-stone-800">

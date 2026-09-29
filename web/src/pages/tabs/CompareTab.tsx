@@ -75,8 +75,8 @@ export default function CompareTab(props: TabProps) {
   return (
     <div className="space-y-8">
       <p className="text-sm text-stone-600">
-        GreenProof pairs the earliest and latest photo of each site, at least two weeks apart, preferring photos taken from the same spot (photo GPS and
-        compass direction). Both photos are cropped identically by Cloudinary so the slider lines up; faces are blurred. You can also choose the pair yourself.
+        GreenProof pairs photos of each site taken at least two weeks apart. When both have GPS, their positions must be within 150 m; compass direction helps rank candidates.
+        Cloudinary applies the same crop and face blur to both photos. You can also choose a pair yourself.
       </p>
       {project.sites.map((site) => {
         const pair = site.pair;
