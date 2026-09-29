@@ -140,6 +140,7 @@ export default function ProjectPage() {
               <p className="mt-0.5 text-sm text-stone-500">
                 {[project.org, project.funder && `funded by ${project.funder}`, project.start_date && `started ${project.start_date}`].filter(Boolean).join(" · ")}
               </p>
+              {project.description && <p className="mt-1.5 max-w-3xl text-sm text-stone-600 line-clamp-2" title={project.description}>{project.description}</p>}
             </div>
             {shareUrl && (
               <div className="flex gap-2">

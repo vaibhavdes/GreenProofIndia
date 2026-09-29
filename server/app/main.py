@@ -167,6 +167,20 @@ def build_view(project: dict, public: bool = False) -> dict:
     return view
 
 
+def _cover(project: dict) -> str | None:
+    """The "after" photo of a chosen before/after pair, else the latest photo that shows the site itself."""
+    usable = [
+        e for e in project.get("evidence", [])
+        if e.get("status") == "ready" and e.get("resource_type") == "image" and (e.get("review") or {}).get("status") != "rejected"
+    ]
+    by_id = {e["id"]: e for e in usable}
+    chosen = [by_id[s["pair"]["after"]] for s in project.get("sites", []) if (s.get("pair") or {}).get("after") in by_id]
+    views = [e for e in usable if not (e.get("activities") and {a["name"] for a in e["activities"]} <= story.NOT_A_VIEW)]
+    latest = sorted(views or usable, key=lambda e: e.get("uploaded_at") or "", reverse=True)
+    pick = (chosen or latest or [None])[0]
+    return story.views(pick, True)["thumb"] if pick else None
+
+
 def summary(project: dict) -> dict:
     ev = project.get("evidence", [])
     return {
@@ -177,7 +191,7 @@ def summary(project: dict) -> dict:
         "funder": project.get("funder"),
         "sites": len(project.get("sites", [])),
         "evidence": len(ev),
-        "cover": next((story.views(e, True)["thumb"] for e in sorted(ev, key=lambda e: e.get("uploaded_at") or "", reverse=True) if e.get("status") == "ready"), None),
+        "cover": _cover(project),
         "created_at": project.get("created_at"),
     }
 

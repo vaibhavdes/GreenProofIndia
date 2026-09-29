@@ -39,6 +39,9 @@ export default function EvidenceCard({ ev, sites, onOpen, match }: { ev: Evidenc
         )}
         {match && <span className="absolute bottom-2 left-2 rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-medium text-white">{match} match</span>}
         {rejected && <span className="absolute bottom-2 right-2 rounded bg-red-700 px-1.5 py-0.5 text-[10px] font-semibold text-white">REJECTED</span>}
+        {ev.review?.status === "accepted" && (
+          <span className="absolute bottom-2 right-2 rounded bg-emerald-700 px-1.5 py-0.5 text-[10px] font-semibold text-white">ACCEPTED</span>
+        )}
       </div>
       <div className="space-y-1 p-2.5">
         <div className="line-clamp-1 text-sm font-medium text-stone-800">{ev.activities?.[0]?.name ?? ev.caption ?? (ev.resource_type === "video" ? "Video" : "Photo")}</div>

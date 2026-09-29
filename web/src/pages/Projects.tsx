@@ -1,4 +1,4 @@
-import { Droplets, FolderPlus, ImageIcon, MapPinned, ShieldCheck, Sprout, Trees } from "lucide-react";
+import { Copy, Droplets, FolderPlus, ImageIcon, ImageUp, MapPinOff, ShieldCheck, Share2, Sprout, Trees } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header, { EditorKeyDialog } from "../components/Header";
@@ -95,28 +95,62 @@ export default function Projects() {
     <div className="min-h-screen">
       <Header />
       <section className="border-b border-stone-200 bg-gradient-to-br from-emerald-900 via-emerald-800 to-sky-900 text-white">
-        <div className="mx-auto max-w-7xl px-4 py-12">
+        <div className="mx-auto max-w-7xl px-4 py-10">
           <p className="text-sm font-medium uppercase tracking-wider text-emerald-200">Evidence for lake revival and plantation projects</p>
           <h1 className="mt-2 max-w-3xl text-3xl font-bold leading-tight sm:text-4xl">Did the lake fill up? Are the saplings alive? Show proof funders can trust.</h1>
           <p className="mt-3 max-w-2xl text-emerald-100">
-            Lake revivals, CSR plantations and green credits are paid for on photo evidence that is easy to reuse and hard to check. GreenProof keeps every field photo
-            and video in Cloudinary, where its AI describes what each one shows, then checks where and when it was taken, flags photos reused across projects, and turns
-            the evidence into before/after comparisons, impact numbers and a report funders can trust.
+            Restoration work is paid for on field photos. GreenProof turns those photos into evidence a funder can check.
           </p>
-          <div className="mt-6 grid max-w-3xl grid-cols-2 gap-3 text-sm sm:grid-cols-4">
-            {[
-              [ImageIcon, "AI tags & captions"],
-              [ShieldCheck, "Proof Score & reuse check"],
-              [MapPinned, "GPS matched to site"],
-              [Sprout, "Before/after & impact reel"],
-            ].map(([Icon, label]) => {
-              const I = Icon as typeof ImageIcon;
-              return (
-                <div key={label as string} className="flex items-center gap-2 rounded-lg bg-white/10 px-3 py-2">
-                  <I className="size-4 shrink-0 text-emerald-200" /> {label as string}
-                </div>
-              );
-            })}
+
+          <div className="mt-8 grid gap-4 lg:grid-cols-[1fr_2fr]">
+            <div className="rounded-xl bg-black/15 p-5 ring-1 ring-white/10">
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-amber-200">The problem</h2>
+              <ul className="mt-3 space-y-2.5 text-sm text-emerald-50">
+                {[
+                  [Copy, "The same old photo is sent again for new work"],
+                  [MapPinOff, "WhatsApp strips the location and date"],
+                  [Sprout, "Saplings are rarely checked again after planting"],
+                ].map(([Icon, text]) => {
+                  const I = Icon as typeof Copy;
+                  return (
+                    <li key={text as string} className="flex gap-2.5">
+                      <I className="mt-0.5 size-4 shrink-0 text-amber-200" /> {text as string}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+            <div className="rounded-xl bg-white/10 p-5 ring-1 ring-white/10">
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-emerald-200">How GreenProof works, on Cloudinary</h2>
+              <ol className="mt-3 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
+                {[
+                  [ImageUp, "Upload", "Field teams send photos and videos straight to Cloudinary."],
+                  [ImageIcon, "Understand", "Cloudinary AI describes each one and tags the work it shows."],
+                  [ShieldCheck, "Check", "A Proof Score tests place, time, reuse and edits."],
+                  [Share2, "Share", "Before/after, reel and a report the funder opens from one link."],
+                ].map(([Icon, title, text], i) => {
+                  const I = Icon as typeof ImageIcon;
+                  return (
+                    <li key={title as string}>
+                      <div className="flex items-center gap-2 font-semibold">
+                        <span className="grid size-6 place-items-center rounded-full bg-emerald-400/20 text-xs text-emerald-100">{i + 1}</span>
+                        <I className="size-4 text-emerald-200" /> {title as string}
+                      </div>
+                      <p className="mt-1 text-emerald-100/90">{text as string}</p>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+          </div>
+
+          <div className="mt-5 flex flex-wrap items-center gap-2 text-xs">
+            <span className="text-emerald-200">Useful for</span>
+            {["Lake and pond revival", "CSR tree planting", "Green and carbon credit projects", "Farm and agroforestry planting"].map((t) => (
+              <span key={t} className="rounded-full bg-white/10 px-3 py-1 ring-1 ring-white/15">
+                {t}
+              </span>
+            ))}
           </div>
         </div>
       </section>
