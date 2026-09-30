@@ -89,6 +89,8 @@ A "next steps" strip on each project shows what is left: outline the site, uploa
 
 Cloudinary is the only storage: there is no separate database.
 
+**Built with Cloudinary's AI Skills Pack.** The repo includes Cloudinary's skills for AI coding assistants (`.claude/skills/`, installed with `npx skills add cloudinary-devs/skills`): `cloudinary-transformations`, `cloudinary-docs` and `cloudinary-react`. We used `cloudinary-transformations` to review every delivery URL in `story.py` and `evidence.py`: display images end with `q_auto/f_auto`, while the social images, reel frames and PDF pages keep an explicit JPG because they are downloaded or joined with `multi`.
+
 ## How it works
 
 ![GreenProof architecture](docs/architecture.svg)
